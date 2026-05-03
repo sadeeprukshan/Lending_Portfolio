@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>LendingOS — Intelligent Lending Portfolio Platform</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0d1117;--ink2:#1e2530;--ink3:#2d3748;
+  --mist:#f7f8fa;--mist2:#eef0f4;--mist3:#dde1e9;
+  --gold:#c9973a;--gold2:#e6b55a;--gold-bg:#fdf8f0;
+  --green:#1a6b4a;--green2:#2d9467;--green-bg:#f0f9f4;
+  --red:#c0392b;--red-bg:#fef5f4;
+  --text:#1e2530;--muted:#6b7280;--dim:#9ca3af;
+  --radius:10px;--radius-lg:16px;--radius-xl:24px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.06);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--mist);color:var(--text);line-height:1.6;overflow-x:hidden}
+button,input,select,textarea{font-family:inherit;outline:none}
+a{color:inherit;text-decoration:none}
+img{max-width:100%}
+
+/* ── NAV ── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,248,250,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--mist3);padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink);letter-spacing:-.5px;display:flex;align-items:center;gap:8px}
+.nav-logo-dot{width:8px;height:8px;background:var(--gold);border-radius:50%;flex-shrink:0}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-link{font-size:14px;color:var(--muted);transition:color .15s;font-weight:500}
+.nav-link:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 20px;border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;border:none}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-primary:hover{background:var(--ink2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.btn-outline{background:transparent;color:var(--ink);border:1.5px solid var(--mist3)}
+.btn-outline:hover{border-color:var(--ink3);background:var(--mist2)}
+.btn-gold{background:var(--gold);color:#fff}
+.btn-gold:hover{background:var(--gold2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(201,151,58,.35)}
+.btn-lg{padding:14px 32px;font-size:15px;border-radius:var(--radius-lg)}
+
+/* ── HERO ── */
+.hero{padding:140px 40px 80px;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--gold-bg);border:1px solid rgba(201,151,58,.25);padding:5px 14px;border-radius:40px;font-size:12px;font-weight:500;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;margin-bottom:24px}
+.hero-eyebrow-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.hero-title{font-family:'Playfair Display',serif;font-size:54px;font-weight:700;line-height:1.1;letter-spacing:-1.5px;color:var(--ink);margin-bottom:20px}
+.hero-title span{color:var(--gold)}
+.hero-desc{font-size:17px;color:var(--muted);line-height:1.7;margin-bottom:36px;max-width:480px;font-weight:300}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.hero-stat{font-family:'DM Mono',monospace;font-size:12px;color:var(--dim);margin-top:32px;display:flex;gap:24px;padding-top:24px;border-top:1px solid var(--mist3)}
+.hero-stat-item strong{display:block;font-size:22px;font-weight:700;color:var(--ink);font-family:'Playfair Display',serif;margin-bottom:2px}
+
+/* ── HERO VISUAL ── */
+.hero-visual{position:relative}
+.hero-card{background:#fff;border:1px solid var(--mist3);border-radius:var(--radius-xl);padding:28px;box-shadow:var(--shadow-lg)}
+.hc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.hc-title{font-size:13px;font-weight:600;color:var(--ink)}
+.hc-badge{background:var(--green-bg);color:var(--green2);font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px}
+.hc-kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.hc-kpi{background:var(--mist);border-radius:var(--radius);padding:12px 14px}
+.hc-kpi-label{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-family:'DM Mono',monospace}
+.hc-kpi-value{font-size:20px;font-weight:700;color:var(--ink);font-family:'Playfair Display',serif}
+.hc-kpi-value.gold{color:var(--gold)}
+.hc-progress-label{font-size:11px;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between}
+.hc-progress-bar{background:var(--mist2);border-radius:4px;height:6px;overflow:hidden;margin-bottom:16px}
+.hc-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:4px;width:16%;transition:width 1.5s ease;animation:fillbar 2s 0.5s ease both}
+@keyframes fillbar{from{width:0}to{width:16%}}
+.hc-loans{display:flex;flex-direction:column;gap:8px}
+.hc-loan-row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--mist);border-radius:var(--radius);font-size:12px}
+.hc-loan-name{font-weight:500;color:var(--ink)}
+.hc-loan-amount{font-family:'DM Mono',monospace;color:var(--green2);font-size:11px;font-weight:500}
+.hc-loan-status{width:7px;height:7px;background:#4ade80;border-radius:50%}
+.hero-float-card{position:absolute;background:#fff;border:1px solid var(--mist3);border-radius:var(--radius-lg);padding:14px 18px;box-shadow:var(--shadow-lg);font-size:12px}
+.hero-float-card.top{top:-20px;right:-20px;min-width:160px}
+.hero-float-card.bottom{bottom:-20px;left:-20px;min-width:180px}
+.hfc-label{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em;font-family:'DM Mono',monospace;margin-bottom:3px}
+.hfc-value{font-weight:700;color:var(--ink);font-size:16px;font-family:'Playfair Display',serif}
+.hfc-sub{color:var(--dim);font-size:10px;margin-top:2px}
+
+/* ── FEATURES ── */
+.features{background:#fff;padding:80px 40px;border-top:1px solid var(--mist3);border-bottom:1px solid var(--mist3)}
+.section-eyebrow{text-align:center;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:14px}
+.section-title{text-align:center;font-family:'Playfair Display',serif;font-size:38px;font-weight:700;color:var(--ink);letter-spacing:-1px;margin-bottom:12px;line-height:1.15}
+.section-desc{text-align:center;font-size:16px;color:var(--muted);max-width:520px;margin:0 auto 56px;font-weight:300;line-height:1.7}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1100px;margin:0 auto}
+.feature-card{border:1px solid var(--mist3);border-radius:var(--radius-xl);padding:32px;transition:all .2s;position:relative;overflow:hidden}
+.feature-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));opacity:0;transition:opacity .2s}
+.feature-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.feature-card:hover::before{opacity:1}
+.feature-icon{width:44px;height:44px;background:var(--gold-bg);border:1px solid rgba(201,151,58,.2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:18px}
+.feature-title{font-size:16px;font-weight:600;color:var(--ink);margin-bottom:8px;letter-spacing:-.2px}
+.feature-desc{font-size:14px;color:var(--muted);line-height:1.65;font-weight:300}
+
+/* ── REGISTRATION ── */
+.registration{padding:80px 40px;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1.4fr;gap:80px;align-items:start}
+.reg-left{position:sticky;top:100px}
+.reg-left-title{font-family:'Playfair Display',serif;font-size:38px;font-weight:700;color:var(--ink);line-height:1.15;letter-spacing:-1px;margin-bottom:16px}
+.reg-left-desc{font-size:15px;color:var(--muted);line-height:1.7;font-weight:300;margin-bottom:28px}
+.reg-steps{display:flex;flex-direction:column;gap:16px}
+.reg-step{display:flex;gap:14px;align-items:flex-start}
+.reg-step-num{width:28px;height:28px;background:var(--ink);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;margin-top:1px}
+.reg-step-text{font-size:14px;color:var(--muted);font-weight:300;line-height:1.5}
+.reg-step-text strong{color:var(--ink);font-weight:500;display:block;margin-bottom:2px}
+
+/* ── FORM ── */
+.reg-form-wrap{background:#fff;border:1px solid var(--mist3);border-radius:var(--radius-xl);padding:36px;box-shadow:var(--shadow)}
+.form-section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);font-family:'DM Mono',monospace;margin:24px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--mist3)}
+.form-section-title:first-child{margin-top:0}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid.full{grid-template-columns:1fr}
+.fgroup{display:flex;flex-direction:column;gap:5px}
+.fgroup.full{grid-column:1/-1}
+.fgroup label{font-size:12px;font-weight:500;color:var(--ink3);letter-spacing:.01em}
+.fgroup label span{color:var(--red);margin-left:2px}
+.fgroup input,.fgroup select,.fgroup textarea{background:var(--mist);border:1.5px solid var(--mist3);border-radius:var(--radius);padding:10px 12px;font-size:13px;color:var(--ink);transition:all .15s;font-family:'DM Mono',monospace}
+.fgroup input:focus,.fgroup select:focus,.fgroup textarea:focus{border-color:var(--gold);background:#fff;box-shadow:0 0 0 3px rgba(201,151,58,.1)}
+.fgroup input::placeholder,.fgroup textarea::placeholder{color:var(--dim)}
+.fgroup textarea{resize:vertical;min-height:80px}
+.fgroup select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.password-wrap{position:relative}
+.password-wrap input{width:100%}
+.password-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--dim);font-size:14px;padding:2px 4px}
+.terms-check{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--muted);cursor:pointer}
+.terms-check input[type=checkbox]{width:16px;height:16px;margin-top:1px;cursor:pointer;accent-color:var(--gold)}
+.terms-check a{color:var(--gold);text-decoration:underline;text-underline-offset:2px}
+.submit-btn{width:100%;padding:14px;font-size:15px;font-weight:600;background:var(--ink);color:#fff;border:none;border-radius:var(--radius-lg);cursor:pointer;transition:all .2s;margin-top:20px;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:-.2px}
+.submit-btn:hover:not(:disabled){background:var(--gold);transform:translateY(-1px);box-shadow:0 6px 20px rgba(201,151,58,.3)}
+.submit-btn:disabled{opacity:.6;cursor:not-allowed}
+.form-err{background:var(--red-bg);color:var(--red);border:1px solid rgba(192,57,43,.2);border-radius:var(--radius);padding:10px 14px;font-size:13px;margin-top:12px;display:none}
+.form-ok{background:var(--green-bg);color:var(--green);border:1px solid rgba(45,148,103,.2);border-radius:var(--radius);padding:10px 14px;font-size:13px;margin-top:12px;display:none}
+
+/* ── SUCCESS STATE ── */
+.success-state{display:none;text-align:center;padding:40px 20px}
+.success-icon{width:72px;height:72px;background:var(--green-bg);border:2px solid rgba(45,148,103,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 24px}
+.success-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--ink);margin-bottom:12px}
+.success-desc{font-size:15px;color:var(--muted);line-height:1.7;font-weight:300}
+.success-badge{display:inline-flex;align-items:center;gap:6px;background:var(--gold-bg);border:1px solid rgba(201,151,58,.2);padding:8px 20px;border-radius:40px;font-size:13px;font-weight:500;color:var(--gold);margin-top:20px;font-family:'DM Mono',monospace}
+
+/* ── FOOTER ── */
+.footer{background:var(--ink);color:rgba(255,255,255,.6);padding:40px;text-align:center;font-size:13px;line-height:1.7}
+.footer-logo{font-family:'Playfair Display',serif;font-size:20px;color:#fff;font-weight:700;margin-bottom:8px}
+.footer-login{margin-top:12px}
+.footer-login a{color:var(--gold2);font-weight:500}
+
+/* ── SPINNER ── */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;gap:40px;padding:120px 20px 60px}
+  .hero-title{font-size:40px}
+  .hero-visual{display:none}
+  .features-grid{grid-template-columns:1fr}
+  .registration{grid-template-columns:1fr;gap:40px;padding:60px 20px}
+  .reg-left{position:static}
+  .nav{padding:0 20px}
+  .nav-links{gap:16px}
+  .reg-form-wrap{padding:24px}
+  .form-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-logo-dot"></div>
+    LendingOS
+  </div>
+  <div class="nav-links">
+    <a class="nav-link" href="#features">Features</a>
+    <a class="nav-link" href="#register">Register</a>
+    <a class="nav-link btn btn-outline" href="index.html" style="padding:7px 16px;font-size:13px">Sign in</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <div class="hero-eyebrow">
+      <span class="hero-eyebrow-dot"></span>
+      Lending Portfolio Management
+    </div>
+    <h1 class="hero-title">Manage your lending<br>portfolio with <span>clarity</span></h1>
+    <p class="hero-desc">LendingOS gives you a complete system to track loans, creditors, brokers, interest payments, and documents — all in one place, built for serious lenders.</p>
+    <div class="hero-cta">
+      <a href="#register" class="btn btn-gold btn-lg">Register your company</a>
+      <a href="index.html" class="btn btn-outline btn-lg">Sign in →</a>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-item"><strong>8%</strong>Monthly rate</div>
+      <div class="hero-stat-item"><strong>LKR</strong>Multi-currency</div>
+      <div class="hero-stat-item"><strong>100%</strong>Isolated data</div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-float-card top">
+      <div class="hfc-label">Active loans</div>
+      <div class="hfc-value">16</div>
+      <div class="hfc-sub" style="color:var(--green2)">↑ 2 this month</div>
+    </div>
+    <div class="hero-card">
+      <div class="hc-header">
+        <span class="hc-title">Portfolio overview</span>
+        <span class="hc-badge">Live</span>
+      </div>
+      <div class="hc-kpi-row">
+        <div class="hc-kpi">
+          <div class="hc-kpi-label">Capital deployed</div>
+          <div class="hc-kpi-value gold">1.98M</div>
+        </div>
+        <div class="hc-kpi">
+          <div class="hc-kpi-label">Monthly income</div>
+          <div class="hc-kpi-value">158K</div>
+        </div>
+      </div>
+      <div class="hc-progress-label">
+        <span>Goal: LKR 1,000,000/mo</span>
+        <span style="color:var(--gold);font-family:'DM Mono',monospace;font-size:10px">15.9%</span>
+      </div>
+      <div class="hc-progress-bar"><div class="hc-progress-fill"></div></div>
+      <div class="hc-loans">
+        <div class="hc-loan-row"><span class="hc-loan-name">K. Perera · Shalika</span><span class="hc-loan-amount">LKR 200K</span><div class="hc-loan-status"></div></div>
+        <div class="hc-loan-row"><span class="hc-loan-name">S. Fernando · Rasika</span><span class="hc-loan-amount">LKR 150K</span><div class="hc-loan-status"></div></div>
+        <div class="hc-loan-row"><span class="hc-loan-name">A. Silva · Sandali</span><span class="hc-loan-amount">LKR 300K</span><div class="hc-loan-status"></div></div>
+      </div>
+    </div>
+    <div class="hero-float-card bottom">
+      <div class="hfc-label">This month</div>
+      <div class="hfc-value" style="color:var(--green2)">LKR 158,800</div>
+      <div class="hfc-sub">Interest collected</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-eyebrow">What you get</div>
+  <h2 class="section-title">Everything a lender needs</h2>
+  <p class="section-desc">Built specifically for the way lending businesses actually work — brokers, creditors, documents, and monthly interest cycles.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">⬡</div>
+      <div class="feature-title">Loan management</div>
+      <div class="feature-desc">Create and manage all loan facilities. Track capital, interest rate, payment day, and loan status from a single clean interface.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">◎</div>
+      <div class="feature-title">Broker network</div>
+      <div class="feature-desc">Register your brokers, track which loans they arranged, and view their total capital arranged and monthly income contribution.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">₨</div>
+      <div class="feature-title">Repayment tracking</div>
+      <div class="feature-desc">Record interest payments monthly. View repayment status by broker, grouped by pay day, with period date filters.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📎</div>
+      <div class="feature-title">Document vault</div>
+      <div class="feature-desc">Upload promissory notes, ID copies, mortgage documents, transfer receipts, and other documents. Multiple files per holder.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">◈</div>
+      <div class="feature-title">Portfolio dashboard</div>
+      <div class="feature-desc">KPI cards, broker charts, goal progress toward your monthly income target, and a compound reinvestment projection.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">◍</div>
+      <div class="feature-title">Customer registry</div>
+      <div class="feature-desc">Maintain a full customer (creditor) registry linked by NIC number to their loans, broker, and uploaded ID documents.</div>
+    </div>
+  </div>
+</section>
+
+<!-- REGISTRATION -->
+<section class="registration" id="register">
+  <div class="reg-left">
+    <h2 class="reg-left-title">Register your company</h2>
+    <p class="reg-left-desc">Fill in the form to request access to LendingOS for your company. Your dedicated workspace will be ready after a brief review.</p>
+    <div class="reg-steps">
+      <div class="reg-step"><div class="reg-step-num">1</div><div class="reg-step-text"><strong>Submit registration</strong>Fill in your company details and create your account credentials.</div></div>
+      <div class="reg-step"><div class="reg-step-num">2</div><div class="reg-step-text"><strong>Pending review</strong>Your registration is reviewed, typically within 24 hours.</div></div>
+      <div class="reg-step"><div class="reg-step-num">3</div><div class="reg-step-text"><strong>Access granted</strong>Once approved, your private company workspace is live and you can log in immediately.</div></div>
+    </div>
+  </div>
+
+  <div class="reg-form-wrap">
+    <!-- Registration form -->
+    <div id="reg-form-body">
+      <div class="form-section-title">Company information</div>
+      <div class="form-grid">
+        <div class="fgroup full"><label>Company name <span>*</span></label><input type="text" id="r-company" placeholder="Rukshan Lending Solutions"></div>
+        <div class="fgroup"><label>Business type <span>*</span></label>
+          <select id="r-biztype">
+            <option value="">Select type</option>
+            <option>Private money lending</option>
+            <option>Microfinance</option>
+            <option>Financial services</option>
+            <option>Investment company</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="fgroup"><label>Number of employees</label>
+          <select id="r-employees">
+            <option value="">Select range</option>
+            <option>1 (Solo)</option>
+            <option>2–5</option>
+            <option>6–20</option>
+            <option>21–50</option>
+            <option>50+</option>
+          </select>
+        </div>
+        <div class="fgroup"><label>Business registration no.</label><input type="text" id="r-regnumber" placeholder="PV 12345 / SP 67890"></div>
+        <div class="fgroup"><label>VAT number</label><input type="text" id="r-vat" placeholder="114-234-567-7000"></div>
+        <div class="fgroup"><label>Country</label>
+          <select id="r-country">
+            <option>Sri Lanka</option>
+            <option>India</option>
+            <option>Maldives</option>
+            <option>Bangladesh</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="fgroup"><label>Phone <span>*</span></label><input type="tel" id="r-phone" placeholder="+94 77 123 4567"></div>
+        <div class="fgroup"><label>Website</label><input type="url" id="r-website" placeholder="https://yourcompany.lk"></div>
+        <div class="fgroup full"><label>Business address</label><textarea id="r-address" placeholder="No. 123, Main Street, Colombo 03"></textarea></div>
+      </div>
+
+      <div class="form-section-title">Account credentials</div>
+      <div class="form-grid">
+        <div class="fgroup full"><label>Email address <span>*</span></label><input type="email" id="r-email" placeholder="you@company.lk"></div>
+        <div class="fgroup">
+          <label>Password <span>*</span></label>
+          <div class="password-wrap">
+            <input type="password" id="r-password" placeholder="Min. 8 characters">
+            <button type="button" class="password-toggle" onclick="togglePwd('r-password',this)">👁</button>
+          </div>
+        </div>
+        <div class="fgroup">
+          <label>Confirm password <span>*</span></label>
+          <div class="password-wrap">
+            <input type="password" id="r-password2" placeholder="Repeat password">
+            <button type="button" class="password-toggle" onclick="togglePwd('r-password2',this)">👁</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:18px">
+        <label class="terms-check">
+          <input type="checkbox" id="r-terms">
+          <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I confirm the business information above is accurate.</span>
+        </label>
+      </div>
+
+      <button class="submit-btn" id="reg-submit-btn" onclick="submitRegistration()">
+        <span id="reg-btn-text">Submit registration</span>
+        <div class="spinner" id="reg-spinner" style="display:none"></div>
+      </button>
+      <div class="form-err" id="reg-err"></div>
+      <div class="form-ok" id="reg-ok"></div>
+    </div>
+
+    <!-- Success state -->
+    <div class="success-state" id="reg-success">
+      <div class="success-icon">✓</div>
+      <div class="success-title">Registration submitted</div>
+      <div class="success-desc">
+        Thank you for registering with LendingOS. Your application is under review.<br><br>
+        You will receive an email at <strong id="success-email"></strong> once your company workspace has been approved.
+      </div>
+      <div class="success-badge">⏳ Pending approval</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">LendingOS</div>
+  <div>Intelligent lending portfolio management</div>
+  <div class="footer-login">Already registered? <a href="index.html">Sign in to your workspace →</a></div>
+</footer>
+
+<script>
+const {createClient} = supabase;
+
+// ── HARDCODED CREDENTIALS ─────────────────────────────────────
+const SUPABASE_URL = 'https://bqzyeoy1hpwllymxgfwa.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxenllb3lsaHB3bGx5bXhnZndhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTU1MzgsImV4cCI6MjA5MTM5MTUzOH0.ATSU-CCjhH-o_ICtlk0mXjrB7lWb_WfCTsweLscVUnM';
+
+const url = SUPABASE_URL;
+const key = SUPABASE_KEY;
+const sb = (url && key) ? createClient(url, key) : null;
+
+function togglePwd(id, btn) {
+  const inp = document.getElementById(id);
+  if(inp.type === 'password'){ inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
+
+function showErr(msg){ const el=document.getElementById('reg-err'); el.textContent=msg; el.style.display='block'; document.getElementById('reg-ok').style.display='none'; }
+function showOk(msg){ const el=document.getElementById('reg-ok'); el.textContent=msg; el.style.display='block'; document.getElementById('reg-err').style.display='none'; }
+function clearMsgs(){ document.getElementById('reg-err').style.display='none'; document.getElementById('reg-ok').style.display='none'; }
+
+function slugify(str){ return 'co_'+str.toLowerCase().replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,'').slice(0,40)+'_'+Date.now().toString(36); }
+
+async function submitRegistration(){
+  if(!sb){ showErr('App not configured. Contact the administrator.'); return; }
+  clearMsgs();
+
+  const company  = document.getElementById('r-company').value.trim();
+  const biztype  = document.getElementById('r-biztype').value;
+  const employees= document.getElementById('r-employees').value;
+  const regnumber= document.getElementById('r-regnumber').value.trim();
+  const vat      = document.getElementById('r-vat').value.trim();
+  const country  = document.getElementById('r-country').value;
+  const phone    = document.getElementById('r-phone').value.trim();
+  const website  = document.getElementById('r-website').value.trim();
+  const address  = document.getElementById('r-address').value.trim();
+  const email    = document.getElementById('r-email').value.trim().toLowerCase();
+  const pwd      = document.getElementById('r-password').value;
+  const pwd2     = document.getElementById('r-password2').value;
+  const terms    = document.getElementById('r-terms').checked;
+
+  if(!company) return showErr('Company name is required.');
+  if(!biztype) return showErr('Please select a business type.');
+  if(!phone)   return showErr('Phone number is required.');
+  if(!email)   return showErr('Email address is required.');
+  if(!pwd || pwd.length < 8) return showErr('Password must be at least 8 characters.');
+  if(pwd !== pwd2) return showErr('Passwords do not match.');
+  if(!terms) return showErr('Please accept the terms and conditions.');
+
+  // UI loading state
+  document.getElementById('reg-submit-btn').disabled = true;
+  document.getElementById('reg-btn-text').textContent = 'Submitting…';
+  document.getElementById('reg-spinner').style.display = 'block';
+
+  try {
+    // Step 1: Insert registration record FIRST while still anon
+    // Uses the standalone 'registrations' table — no multi-tenancy SQL required
+    const { data: regData, error: regErr } = await sb
+      .from('registrations')
+      .insert([{
+        company_name:  company,
+        business_type: biztype  || null,
+        reg_number:    regnumber || null,
+        vat_number:    vat      || null,
+        phone,
+        email,
+        website:       website  || null,
+        country,
+        num_employees: employees || null,
+        address:       address  || null,
+        status:        'pending',
+      }])
+      .select()
+      .single();
+
+    if(regErr) throw regErr;
+    const regId = regData.id;
+
+    // Step 2: Create Supabase auth user — sends confirmation email to verify.html
+    const base = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+    const { data: authData, error: authErr } = await sb.auth.signUp({
+      email, password: pwd,
+      options: {
+        data: { company_name: company, registration_id: regId },
+        emailRedirectTo: base + 'verify.html'
+      }
+    });
+    if(authErr) throw authErr;
+
+    // Step 3: Link the auth user_id back to the registration row (best effort)
+    const userId = authData?.user?.id;
+    if(userId){
+      await sb.from('registrations').update({ user_id: userId }).eq('id', regId);
+    }
+
+    // Step 4: Show success
+    document.getElementById('reg-form-body').style.display = 'none';
+    document.getElementById('success-email').textContent = email;
+    document.getElementById('reg-success').style.display = 'block';
+
+  } catch(e) {
+    showErr('Registration error: ' + (e.message || e));
+    document.getElementById('reg-submit-btn').disabled = false;
+    document.getElementById('reg-btn-text').textContent = 'Submit registration';
+    document.getElementById('reg-spinner').style.display = 'none';
+  }
+}
+</script>
+</body>
+</html>

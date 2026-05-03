@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>LendingOS — Admin Panel</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f0e;--surface:#141714;--card:#1a1d1a;
+  --border:#2a2e2a;--border2:#3a3f3a;
+  --text:#e8ece8;--muted:#7a8a7a;--dim:#4a574a;
+  --accent:#a3e635;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;
+  --green:#4ade80;--green-bg:#052e16;
+  --amber-bg:#1c1300;--red-bg:#1c0404;--blue-bg:#0c1a2e;
+  --radius:8px;--radius-lg:12px;
+  font-family:'Syne',sans-serif;
+}
+body{background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+button{font-family:inherit;cursor:pointer;border:none;outline:none}
+input,select,textarea{font-family:'DM Mono',monospace;outline:none}
+.mono{font-family:'DM Mono',monospace}
+
+/* ── AUTH SCREEN ── */
+.screen{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);align-items:center;justify-content:center}
+.screen.active{display:flex}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;max-width:380px;width:100%}
+.auth-logo{font-size:22px;font-weight:700;color:var(--accent);letter-spacing:-1px;margin-bottom:4px}
+.auth-sub{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:24px}
+.auth-field{margin-bottom:12px}
+.auth-field label{display:block;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.auth-field input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--text)}
+.auth-btn{width:100%;padding:11px;background:var(--accent);color:#0a0f0a;font-weight:700;font-size:13px;border-radius:var(--radius);margin-top:4px;cursor:pointer;transition:opacity .15s}
+.auth-btn:hover{opacity:.9}
+.auth-err{font-family:'DM Mono',monospace;font-size:11px;color:var(--red);margin-top:8px;min-height:16px}
+.access-denied{text-align:center;padding:20px}
+.access-denied .icon{font-size:40px;margin-bottom:12px}
+.access-denied p{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)}
+
+/* ── APP LAYOUT ── */
+.app{display:none;flex-direction:column;min-height:100vh}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-logo{font-size:18px;font-weight:700;color:var(--accent);letter-spacing:-0.5px}
+.topbar-meta{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:16px}
+.admin-badge{background:var(--amber-bg);color:var(--amber);padding:2px 10px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.05em}
+.content{padding:28px 32px;max-width:1400px;margin:0 auto;width:100%}
+
+/* ── STATS STRIP ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 20px}
+.stat-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.stat-value{font-size:26px;font-weight:700;letter-spacing:-1px}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--surface);border-radius:var(--radius-lg);padding:4px;width:fit-content}
+.tab{padding:7px 18px;border-radius:var(--radius);font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .15s}
+.tab.active{background:var(--card);color:var(--text);border:1px solid var(--border)}
+
+/* ── TABLE ── */
+.table-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{text-align:left;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface)}
+.tbl td{padding:13px 16px;border-bottom:1px solid var(--border);vertical-align:top;font-size:13px}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,255,255,.01)}
+.badge{display:inline-flex;align-items:center;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;white-space:nowrap;font-family:'DM Mono',monospace}
+.badge-pending{background:var(--amber-bg);color:var(--amber)}
+.badge-approved{background:var(--green-bg);color:var(--green)}
+.badge-rejected{background:var(--red-bg);color:var(--red)}
+.badge-suspended{background:var(--blue-bg);color:var(--blue)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:var(--radius);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'DM Mono',monospace;border:1px solid transparent}
+.btn-approve{background:var(--green-bg);color:var(--green);border-color:#0f4021}
+.btn-approve:hover{background:#0a3318}
+.btn-reject{background:var(--red-bg);color:var(--red);border-color:#3d1010}
+.btn-reject:hover{background:#200808}
+.btn-ghost{background:var(--surface);color:var(--muted);border-color:var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2)}
+
+/* ── DETAIL DRAWER ── */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;backdrop-filter:blur(2px)}
+.drawer-overlay.open{display:block}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:480px;background:var(--surface);border-left:1px solid var(--border);z-index:201;overflow-y:auto;transform:translateX(100%);transition:transform .25s ease}
+.drawer.open{transform:translateX(0)}
+.drawer-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:10}
+.drawer-title{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.drawer-close{background:var(--card);border:1px solid var(--border);color:var(--muted);width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
+.drawer-body{padding:24px}
+.detail-row{display:flex;flex-direction:column;gap:3px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.detail-row:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.detail-key{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.detail-val{font-size:13px;color:var(--text);line-height:1.4}
+.drawer-actions{display:flex;gap:8px;flex-wrap:wrap;padding:20px 24px;border-top:1px solid var(--border);background:var(--surface);position:sticky;bottom:0}
+.drawer-actions .btn{padding:9px 20px;font-size:12px}
+.notes-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;font-size:12px;color:var(--text);margin-top:8px;min-height:70px;resize:vertical}
+.action-msg{font-family:'DM Mono',monospace;font-size:11px;margin-top:8px}
+.action-msg.ok{color:var(--accent)} .action-msg.err{color:var(--red)}
+
+/* ── SPINNER ── */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+.loading-row td{text-align:center;color:var(--muted);padding:32px;font-family:'DM Mono',monospace;font-size:12px}
+@media(max-width:700px){.drawer{width:100%}.stats-row{grid-template-columns:1fr 1fr}.content{padding:16px}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="screen active" id="screen-login">
+  <div class="auth-card">
+    <div class="auth-logo">LendingOS</div>
+    <div class="auth-sub">Admin panel — restricted access</div>
+    <div class="auth-field"><label>Email</label><input type="email" id="adm-email" placeholder="sadeeprukshan7@gmail.com"></div>
+    <div class="auth-field"><label>Password</label><input type="password" id="adm-pwd" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+    <button class="auth-btn" onclick="adminLogin()">Sign in</button>
+    <div class="auth-err" id="adm-err"></div>
+  </div>
+</div>
+
+<!-- ACCESS DENIED SCREEN -->
+<div class="screen" id="screen-denied">
+  <div class="auth-card">
+    <div class="access-denied">
+      <div class="icon">⛔</div>
+      <div class="auth-logo" style="color:var(--red)">Access denied</div>
+      <p style="margin-top:12px">This account is not authorised to access the admin panel.</p>
+      <button class="auth-btn" style="margin-top:20px;background:var(--surface);color:var(--text);border:1px solid var(--border)" onclick="doLogout()">Sign out</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app" id="main-app">
+  <div class="topbar">
+    <div class="topbar-logo">LendingOS <span style="color:var(--muted);font-size:12px;font-weight:400">/ Admin</span></div>
+    <div class="topbar-meta">
+      <span class="admin-badge">ADMIN</span>
+      <span id="adm-user-email" style="color:var(--muted)"></span>
+      <button class="btn btn-ghost" onclick="doLogout()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Stats -->
+    <div class="stats-row" id="stats-row">
+      <div class="stat-card"><div class="stat-label">Total companies</div><div class="stat-value" id="s-total">—</div></div>
+      <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value" style="color:var(--amber)" id="s-pending">—</div></div>
+      <div class="stat-card"><div class="stat-label">Approved</div><div class="stat-value" style="color:var(--green)" id="s-approved">—</div></div>
+      <div class="stat-card"><div class="stat-label">Rejected</div><div class="stat-value" style="color:var(--red)" id="s-rejected">—</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" onclick="setTab('pending',this)">Pending review</div>
+      <div class="tab" onclick="setTab('approved',this)">Approved</div>
+      <div class="tab" onclick="setTab('rejected',this)">Rejected</div>
+      <div class="tab" onclick="setTab('all',this)">All companies</div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table class="tbl">
+        <thead><tr>
+          <th>Company</th>
+          <th>Email</th>
+          <th>Type</th>
+          <th>Country</th>
+          <th>Employees</th>
+          <th>Registered</th>
+          <th>Status</th>
+          <th></th>
+        </tr></thead>
+        <tbody id="companies-tbody">
+          <tr class="loading-row"><td colspan="8">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL DRAWER -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="drawer-title" id="drawer-title">Company details</div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+  <div class="drawer-actions" id="drawer-actions"></div>
+</div>
+
+<script>
+const {createClient} = supabase;
+
+// ── HARDCODED CREDENTIALS ──────────────────────────────────────────────
+const SUPABASE_URL = 'https://bqzyeoy1hpwllymxgfwa.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxenllb3lsaHB3bGx5bXhnZndhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTU1MzgsImV4cCI6MjA5MTM5MTUzOH0.ATSU-CCjhH-o_ICtlk0mXjrB7lWb_WfCTsweLscVUnM';
+const ADMIN_EMAIL  = 'sadeeprukshan7@gmail.com';  // only this email can access
+
+const url = SUPABASE_URL;
+const key = SUPABASE_KEY;
+let sb = null;
+let allCompanies = [];
+let currentTab = 'pending';
+
+window.onload = async () => {
+  if(!url||!key){ document.getElementById('adm-err').textContent='Credentials not set. Update  and  in admin.html.'; return; }
+  sb = createClient(url, key);
+  const {data:{session}} = await sb.auth.getSession();
+  if(session) checkAndLaunch(session.user.email);
+};
+
+async function adminLogin(){
+  const email = document.getElementById('adm-email').value.trim();
+  const pwd   = document.getElementById('adm-pwd').value;
+  const err   = document.getElementById('adm-err');
+  err.textContent = '';
+  if(!email||!pwd){err.textContent='Email and password required.';return}
+  const {data, error} = await sb.auth.signInWithPassword({email, password:pwd});
+  if(error){err.textContent=error.message;return}
+  checkAndLaunch(data.user.email);
+}
+
+function checkAndLaunch(email){
+  if(email !== ADMIN_EMAIL){
+    showScreen('denied');
+    return;
+  }
+  document.getElementById('adm-user-email').textContent = email;
+  showScreen(null); // hide all screens
+  document.getElementById('main-app').style.display = 'flex';
+  loadCompanies();
+}
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  if(name) document.getElementById('screen-'+name).classList.add('active');
+  document.getElementById('main-app').style.display = 'none';
+}
+
+async function doLogout(){
+  await sb.auth.signOut();
+  document.getElementById('main-app').style.display = 'none';
+  showScreen('login');
+}
+
+async function loadCompanies(){
+  const {data, error} = await sb.from('companies').select('*').order('registered_at',{ascending:false});
+  if(error){ console.error(error); return; }
+  allCompanies = data || [];
+  updateStats();
+  renderTable(currentTab);
+}
+
+function updateStats(){
+  document.getElementById('s-total').textContent   = allCompanies.length;
+  document.getElementById('s-pending').textContent  = allCompanies.filter(c=>c.status==='pending').length;
+  document.getElementById('s-approved').textContent = allCompanies.filter(c=>c.status==='approved').length;
+  document.getElementById('s-rejected').textContent = allCompanies.filter(c=>c.status==='rejected').length;
+}
+
+function setTab(tab, el){
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderTable(tab);
+}
+
+function renderTable(tab){
+  const filtered = tab==='all' ? allCompanies : allCompanies.filter(c=>c.status===tab);
+  const tbody = document.getElementById('companies-tbody');
+  if(!filtered.length){
+    tbody.innerHTML=`<tr class="loading-row"><td colspan="8">No ${tab==='all'?'':tab} companies.</td></tr>`;
+    return;
+  }
+  const statusBadge = s => ({
+    pending:'badge-pending',approved:'badge-approved',rejected:'badge-rejected',suspended:'badge-suspended'
+  }[s]||'badge-pending');
+  tbody.innerHTML = filtered.map(c=>`
+    <tr>
+      <td><div style="font-weight:600">${esc(c.company_name)}</div><div class="mono" style="font-size:10px;color:var(--dim);margin-top:2px">${esc(c.schema_name)}</div></td>
+      <td class="mono" style="color:var(--muted);font-size:12px">${esc(c.email)}</td>
+      <td style="color:var(--muted);font-size:12px">${esc(c.business_type||'—')}</td>
+      <td style="color:var(--muted);font-size:12px">${esc(c.country||'—')}</td>
+      <td class="mono" style="color:var(--muted);font-size:11px">${esc(c.num_employees||'—')}</td>
+      <td class="mono" style="color:var(--dim);font-size:11px">${fmtDate(c.registered_at)}</td>
+      <td><span class="badge ${statusBadge(c.status)}">${c.status}</span></td>
+      <td><button class="btn btn-ghost" onclick="openDrawer('${c.id}')">View →</button></td>
+    </tr>`).join('');
+}
+
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(d){ if(!d)return'—'; return new Date(d).toLocaleDateString('en-LK',{day:'numeric',month:'short',year:'2-digit'}); }
+
+function openDrawer(id){
+  const c = allCompanies.find(x=>x.id===id);
+  if(!c) return;
+  document.getElementById('drawer-title').textContent = c.company_name;
+
+  const rows = [
+    ['Company name', c.company_name],
+    ['Schema / workspace', c.schema_name],
+    ['Status', `<span class="badge badge-${c.status}">${c.status}</span>`],
+    ['Email', c.email],
+    ['Phone', c.phone||'—'],
+    ['Business type', c.business_type||'—'],
+    ['Business reg. no.', c.reg_number||'—'],
+    ['VAT number', c.vat_number||'—'],
+    ['Country', c.country||'—'],
+    ['Employees', c.num_employees||'—'],
+    ['Website', c.website?`<a href="${esc(c.website)}" target="_blank" style="color:var(--accent)">${esc(c.website)}</a>`:'—'],
+    ['Address', c.address||'—'],
+    ['Registered', fmtDate(c.registered_at)],
+    ['Approved at', c.approved_at ? fmtDate(c.approved_at)+' by '+esc(c.approved_by||'—') : '—'],
+    ['Notes', c.notes||'—'],
+  ];
+
+  document.getElementById('drawer-body').innerHTML =
+    rows.map(([k,v])=>`<div class="detail-row"><div class="detail-key">${k}</div><div class="detail-val">${v}</div></div>`).join('')+
+    `<div class="detail-row"><div class="detail-key">Admin notes</div>
+      <textarea class="notes-input" id="drawer-notes" placeholder="Optional note…">${esc(c.notes||'')}</textarea>
+    </div>`;
+
+  // Action buttons depending on status
+  let actions = '';
+  if(c.status==='pending'||c.status==='rejected'){
+    actions += `<button class="btn btn-approve" onclick="approveCompany('${c.id}')">✓ Approve &amp; provision</button>`;
+  }
+  if(c.status==='pending'||c.status==='approved'){
+    actions += `<button class="btn btn-reject" onclick="rejectCompany('${c.id}')">✕ Reject</button>`;
+  }
+  if(c.status==='approved'){
+    actions += `<button class="btn btn-ghost" onclick="suspendCompany('${c.id}')">⏸ Suspend</button>`;
+  }
+  actions += `<div class="action-msg" id="drawer-action-msg"></div>`;
+  document.getElementById('drawer-actions').innerHTML = actions;
+
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+}
+
+function closeDrawer(){
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+}
+
+async function approveCompany(id){
+  const msg = document.getElementById('drawer-action-msg');
+  msg.textContent = 'Approving and provisioning schema…'; msg.className='action-msg ok';
+  const {data:{user}} = await sb.auth.getUser();
+  const adminEmail = user?.email || ADMIN_EMAIL;
+  // Call the server-side function to provision schema + update status
+  const {error} = await sb.rpc('approve_company',{p_company_id:id, p_admin_email:adminEmail});
+  if(error){ msg.textContent='Error: '+error.message; msg.className='action-msg err'; return; }
+  msg.textContent='Approved. Schema provisioned successfully.'; msg.className='action-msg ok';
+  await loadCompanies();
+  setTimeout(closeDrawer,1500);
+}
+
+async function rejectCompany(id){
+  const notes = document.getElementById('drawer-notes')?.value||'';
+  const msg = document.getElementById('drawer-action-msg');
+  msg.textContent='Rejecting…'; msg.className='action-msg ok';
+  const {data:{user}} = await sb.auth.getUser();
+  const {error} = await sb.rpc('reject_company',{p_company_id:id, p_admin_email:user?.email||ADMIN_EMAIL, p_notes:notes||null});
+  if(error){ msg.textContent='Error: '+error.message; msg.className='action-msg err'; return; }
+  msg.textContent='Rejected.'; msg.className='action-msg ok';
+  await loadCompanies();
+  setTimeout(closeDrawer,1000);
+}
+
+async function suspendCompany(id){
+  const msg = document.getElementById('drawer-action-msg');
+  msg.textContent='Suspending…'; msg.className='action-msg ok';
+  const {error} = await sb.from('companies').update({status:'suspended',updated_at:new Date().toISOString()}).eq('id',id);
+  if(error){ msg.textContent='Error: '+error.message; msg.className='action-msg err'; return; }
+  msg.textContent='Suspended.'; msg.className='action-msg ok';
+  await loadCompanies();
+  setTimeout(closeDrawer,1000);
+}
+</script>
+</body>
+</html>
