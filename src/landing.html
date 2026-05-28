@@ -73,7 +73,7 @@ img{max-width:100%}
 .hc-loan-row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--mist);border-radius:var(--radius);font-size:12px}
 .hc-loan-name{font-weight:500;color:var(--ink)}
 .hc-loan-amount{font-family:'DM Mono',monospace;color:var(--green2);font-size:11px;font-weight:500}
-.hc-loan-status{width:7px;height:7px;background:#4ade80;border-radius:50%}
+.hc-loan-status{width:7px;height:7px;background:#2E7D32;border-radius:50%}
 .hero-float-card{position:absolute;background:#fff;border:1px solid var(--mist3);border-radius:var(--radius-lg);padding:14px 18px;box-shadow:var(--shadow-lg);font-size:12px}
 .hero-float-card.top{top:-20px;right:-20px;min-width:160px}
 .hero-float-card.bottom{bottom:-20px;left:-20px;min-width:180px}
@@ -226,14 +226,14 @@ img{max-width:100%}
       </div>
       <div class="hc-progress-bar"><div class="hc-progress-fill"></div></div>
       <div class="hc-loans">
-        <div class="hc-loan-row"><span class="hc-loan-name">K. Perera · Shalika</span><span class="hc-loan-amount">LKR 200K</span><div class="hc-loan-status"></div></div>
-        <div class="hc-loan-row"><span class="hc-loan-name">S. Fernando · Rasika</span><span class="hc-loan-amount">LKR 150K</span><div class="hc-loan-status"></div></div>
-        <div class="hc-loan-row"><span class="hc-loan-name">A. Silva · Sandali</span><span class="hc-loan-amount">LKR 300K</span><div class="hc-loan-status"></div></div>
+        <div class="hc-loan-row"><span class="hc-loan-name">Client A · Broker 1</span><span class="hc-loan-amount">LKR 200K</span><div class="hc-loan-status"></div></div>
+        <div class="hc-loan-row"><span class="hc-loan-name">Client B · Broker 2</span><span class="hc-loan-amount">LKR 150K</span><div class="hc-loan-status"></div></div>
+        <div class="hc-loan-row"><span class="hc-loan-name">Client C · Broker 3</span><span class="hc-loan-amount">LKR 300K</span><div class="hc-loan-status"></div></div>
       </div>
     </div>
     <div class="hero-float-card bottom">
       <div class="hfc-label">This month</div>
-      <div class="hfc-value" style="color:var(--green2)">LKR 158,800</div>
+      <div class="hfc-value" style="color:var(--green2)">LKR 52,000</div>
       <div class="hfc-sub">Interest collected</div>
     </div>
   </div>
@@ -334,18 +334,18 @@ img{max-width:100%}
 
       <div class="form-section-title">Account credentials</div>
       <div class="form-grid">
-        <div class="fgroup full"><label>Email address <span>*</span></label><input type="email" id="r-email" placeholder="you@company.lk"></div>
+        <div class="fgroup full"><label>Email address <span>*</span></label><input type="email" id="r-email" placeholder="you@company.lk" autocomplete="off"></div>
         <div class="fgroup">
           <label>Password <span>*</span></label>
           <div class="password-wrap">
-            <input type="password" id="r-password" placeholder="Min. 8 characters">
+            <input type="password" id="r-password" placeholder="Min. 8 characters" autocomplete="new-password">
             <button type="button" class="password-toggle" onclick="togglePwd('r-password',this)">👁</button>
           </div>
         </div>
         <div class="fgroup">
           <label>Confirm password <span>*</span></label>
           <div class="password-wrap">
-            <input type="password" id="r-password2" placeholder="Repeat password">
+            <input type="password" id="r-password2" placeholder="Repeat password" autocomplete="new-password">
             <button type="button" class="password-toggle" onclick="togglePwd('r-password2',this)">👁</button>
           </div>
         </div>

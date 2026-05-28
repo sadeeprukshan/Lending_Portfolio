@@ -1,0 +1,1336 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   LendingOS V13 — Figma Design Tokens (Drop-in CSS Patch)
+   ───────────────────────────────────────────────────────────────────────────
+   Applied as a separate stylesheet AFTER your main styles so it overrides
+   the older tokens. Pure CSS — no HTML structure changes, no JS changes.
+   
+   To use:
+   1. Save this file as src/lendos-v13-theme.css
+   2. Import it in index.html AFTER your existing <style> block, e.g.:
+        <link rel="stylesheet" href="/lendos-v13-theme.css">
+      OR add it to the <head>
+   3. Optionally add the Inter font from Google Fonts (see end of file)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── 1. Color tokens (dark mode default) ─────────────────────────────── */
+:root {
+  /* Backgrounds */
+  --bg: #0F1729;
+  --surface: #0F1729;
+  --card: #161F35;
+  --card-2: #1A2540;
+
+  /* Borders */
+  --border: #1F2940;
+  --border2: #2A3552;
+
+  /* Text */
+  --text: #F5F5F5;
+  --text-2: #E6E9EF;
+  --muted: #8B95A7;
+  --dim: #5C6577;
+
+  /* Semantic */
+  --green: #4CAF50;
+  --green-bg: rgba(76, 175, 80, 0.12);
+  --amber: #FFC107;
+  --amber-bg: rgba(255, 193, 7, 0.12);
+  --red: #E94B6B;
+  --red-bg: rgba(233, 75, 107, 0.12);
+  --blue: #4A8FFF;
+  --blue-bg: rgba(74, 143, 255, 0.12);
+
+  /* Brand */
+  --accent: #FFC107;
+  --primary: #0F1729;
+  --primary-light: #1A2540;
+  --secondary: #161F35;
+  --success: #4CAF50;
+  --cta: #FFC107;
+
+  /* Geometry */
+  --radius: 8px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --sidebar-w: 220px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* Typography */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ─── 2. Light mode tokens ──────────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg: #F7F8FB;
+  --surface: #FFFFFF;
+  --card: #FFFFFF;
+  --card-2: #F7F8FB;
+  --border: #E5E8EE;
+  --border2: #CFD4DD;
+  --text: #0D1424;
+  --text-2: #1E2A44;
+  --muted: #5C6577;
+  --dim: #8B95A7;
+  --green: #2E7D32;
+  --green-bg: #E8F5E9;
+  --amber: #F57F17;
+  --amber-bg: #FFF8E1;
+  --red: #C62828;
+  --red-bg: #FFEBEE;
+  --blue: #0D47A1;
+  --blue-bg: #E3F2FD;
+  --accent: #FFC107;
+  --primary: #FFFFFF;
+  --primary-light: #F7F8FB;
+  --secondary: #FFFFFF;
+  --success: #2E7D32;
+  --cta: #FFC107;
+}
+
+/* ─── 3. Base body & typography ─────────────────────────────────────────── */
+body {
+  background: var(--bg) !important;
+  color: var(--text) !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Inter', sans-serif !important;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+h1 { font-size: 28px; }
+h2 { font-size: 22px; }
+h3 { font-size: 16px; font-weight: 600; }
+
+/* Small uppercase labels (used in KPI cards) */
+.label-cap,
+.metric-card label,
+.kpi-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Monospace numbers */
+.mono,
+.num,
+.tbl td.mono,
+.dtable td.mono {
+  font-family: 'JetBrains Mono', 'DM Mono', 'SF Mono', Consolas, monospace !important;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* ─── 4. Sidebar ────────────────────────────────────────────────────────── */
+.sidebar {
+  background: #1F2937 !important;
+  border-right: 1px solid var(--border) !important;
+}
+
+.logo {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--text) !important;
+  font-size: 20px !important;
+}
+
+.logo .accent,
+.logo-accent {
+  color: var(--cta);
+}
+
+/* Add a small "Portfolio Manager" subtitle line below logo if you wish */
+.logo-subtitle {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px !important;
+  border-radius: var(--radius) !important;
+  cursor: pointer;
+  color: var(--muted) !important;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  margin: 1px 8px;
+}
+
+.nav-item:hover {
+  background: var(--card) !important;
+  color: var(--text) !important;
+}
+
+.nav-item.active {
+  background: #0F1729 !important;
+  color: var(--text) !important;
+}
+
+/* Gold left border accent for active nav item (Figma signature) */
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: var(--cta);
+  border-radius: 0 2px 2px 0;
+}
+
+.nav-item.active .nav-icon {
+  color: var(--cta) !important;
+}
+
+.nav-icon {
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+  font-size: 14px;
+  color: var(--muted);
+  transition: color 0.15s;
+}
+
+.nav-section {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 14px 14px 6px;
+  margin-top: 10px;
+}
+
+/* ─── 5. Topbar ─────────────────────────────────────────────────────────── */
+
+
+#page-title {
+  color: var(--text) !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+}
+
+/* Topbar search */
+.topbar input[type="search"],
+.topbar input[type="text"] {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  padding: 8px 14px 8px 36px !important;
+  border-radius: var(--radius) !important;
+  font-size: 13px !important;
+  min-width: 320px;
+}
+
+.topbar input::placeholder {
+  color: var(--muted);
+}
+
+/* ─── 6. Cards ──────────────────────────────────────────────────────────── */
+.card,
+.form-card,
+.metric-card {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: none !important;
+  padding: 18px !important;
+}
+
+[data-theme="light"] .card,
+[data-theme="light"] .form-card,
+[data-theme="light"] .metric-card {
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* KPI metric card */
+.metric-card {
+  position: relative;
+  padding: 16px 18px !important;
+}
+
+.metric-card .value,
+.metric-card .num {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-top: 6px;
+}
+
+.metric-card .delta-up {
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.metric-card .delta-down {
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Highlighted/featured KPI card — gold background */
+.metric-card.hi {
+  background: var(--cta) !important;
+  border-color: var(--cta) !important;
+  color: #0F1729 !important;
+}
+
+.metric-card.hi label,
+.metric-card.hi .kpi-label {
+  color: rgba(15, 23, 41, 0.7) !important;
+}
+
+.metric-card.hi .value,
+.metric-card.hi .num {
+  color: #0F1729 !important;
+}
+
+/* ─── 7. Buttons ────────────────────────────────────────────────────────── */
+.btn {
+  border-radius: var(--radius) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  padding: 8px 14px !important;
+  border: 1px solid var(--border) !important;
+  background: transparent !important;
+  color: var(--text) !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  background: var(--card-2) !important;
+  border-color: var(--border2) !important;
+}
+
+.btn-sm {
+  padding: 6px 10px !important;
+  font-size: 11px !important;
+}
+
+.btn-primary {
+  background: var(--cta) !important;
+  border-color: var(--cta) !important;
+  color: #0F1729 !important;
+  font-weight: 700 !important;
+  border-radius: 999px !important;
+  padding: 8px 16px !important;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.25);
+}
+
+.btn-red {
+  border-color: var(--red) !important;
+  color: var(--red) !important;
+  background: transparent !important;
+}
+
+.btn-red:hover {
+  background: var(--red-bg) !important;
+}
+
+/* Floating action button (bottom right of dashboard) */
+.fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--cta);
+  color: #0F1729;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+  z-index: 100;
+}
+
+/* ─── 8. Form inputs ────────────────────────────────────────────────────── */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="month"],
+input[type="search"],
+select,
+textarea {
+  background: var(--card-2) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  padding: 9px 12px !important;
+  border-radius: var(--radius) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 13px !important;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--cta) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.15) !important;
+}
+
+label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* ─── 9. Badges ─────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px !important;
+  border-radius: 999px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.badge.bg,
+.badge-success {
+  background: var(--green-bg) !important;
+  color: var(--green) !important;
+}
+
+.badge.ba,
+.badge-warning {
+  background: var(--amber-bg) !important;
+  color: var(--amber) !important;
+}
+
+.badge.bb,
+.badge-info {
+  background: var(--blue-bg) !important;
+  color: var(--blue) !important;
+}
+
+.badge.br,
+.badge-danger {
+  background: var(--red-bg) !important;
+  color: var(--red) !important;
+}
+
+/* Status dot indicator */
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.status-dot.green { background: var(--green); }
+.status-dot.amber { background: var(--amber); }
+.status-dot.red { background: var(--red); }
+.status-dot.blue { background: var(--blue); }
+
+/* ─── 10. Tables ────────────────────────────────────────────────────────── */
+.dtable,
+.tbl {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dtable th,
+.tbl th {
+  background: transparent !important;
+  color: var(--muted) !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  padding: 12px 10px !important;
+  text-align: left;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+.dtable td,
+.tbl td {
+  padding: 14px 10px !important;
+  font-size: 13px !important;
+  color: var(--text) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+.dtable tbody tr:hover,
+.tbl tbody tr:hover {
+  background: var(--card-2) !important;
+  cursor: pointer;
+}
+
+.dtable tbody tr:last-child td,
+.tbl tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* Customer/entity name + sub-line (NIC) in tables */
+.entity-cell .entity-name {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.entity-cell .entity-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 2px;
+  letter-spacing: 0.04em;
+}
+
+/* ─── 11. Page headers ──────────────────────────────────────────────────── */
+.page-header h2 {
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--text) !important;
+  margin-bottom: 6px;
+}
+
+.page-header .subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+/* Breadcrumb-style location indicator (e.g. DASHBOARD › INSIGHTS) */
+.breadcrumb {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cta);
+  margin-bottom: 8px;
+}
+
+.breadcrumb .sep {
+  color: var(--muted);
+  margin: 0 6px;
+}
+
+/* ─── 12. Auth screens ──────────────────────────────────────────────────── */
+.auth-card {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-xl) !important;
+  padding: 32px !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.auth-logo {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 28px !important;
+  color: var(--text) !important;
+  letter-spacing: -0.02em !important;
+}
+
+.auth-sub {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.auth-tab {
+  border-radius: var(--radius) !important;
+}
+
+.auth-tab.active {
+  background: var(--cta) !important;
+  color: #0F1729 !important;
+  font-weight: 700 !important;
+}
+
+/* ─── 13. Scrollbars ────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* ─── 14. Sidebar footer (Support / user profile) ─────────────────────── */
+.sidebar-footer {
+  padding: 14px 12px !important;
+  border-top: 1px solid var(--border) !important;
+}
+
+.support-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.support-btn:hover {
+  color: var(--text);
+  border-color: var(--border2);
+}
+
+/* ─── 15. Progress bars (goal tracking) ─────────────────────────────────── */
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--card-2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--cta);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progress-fill.success {
+  background: var(--green);
+}
+
+/* ─── 16. Tooltip / hint text ───────────────────────────────────────────── */
+.hint {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ─── 17. Print readability (V11.4 preservation) ────────────────────────── */
+@media print {
+  body { background: #fff !important; color: #000 !important; }
+  .sidebar, .topbar, .fab, .mobile-menu-btn, .sidebar-toggle-btn { display: none !important; }
+  .card, .form-card, .metric-card {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+    background: #fff !important;
+    color: #000 !important;
+    page-break-inside: avoid;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   END OF V13 THEME PATCH
+   ───────────────────────────────────────────────────────────────────────────
+   Optional: add Inter font to <head> of index.html for best results:
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   V13.2 — Refinements based on Figma feedback
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Task 4: Remove border under LendingOS logo */
+.sidebar > div:first-child,
+.sidebar .logo-block,
+.sidebar .sb-header {
+  border-bottom: none !important;
+}
+
+/* Task 2: Loan status card responsive (match Capital by broker pattern) */
+.card .chart-container,
+.card canvas {
+  max-width: 100% !important;
+  max-height: 240px !important;
+  height: auto !important;
+}
+
+/* Make any card with a doughnut/pie chart wrap properly */
+.card[data-chart="status"],
+#loan-status-card,
+.loan-status-card {
+  overflow: hidden !important;
+}
+
+.card[data-chart="status"] canvas,
+#loan-status-card canvas,
+.loan-status-card canvas {
+  max-height: 200px !important;
+  width: auto !important;
+  max-width: 200px !important;
+  margin: 0 auto !important;
+  display: block !important;
+}
+
+/* Task 5: Topbar user profile (moved from sidebar) */
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 12px;
+  margin-left: 8px;
+  border-left: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.topbar-user .tb-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--cta);
+  color: #0F1729;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.topbar-user .tb-info {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.2;
+}
+
+.topbar-user .tb-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.topbar-user .tb-role {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+/* Hide the sidebar footer user block now that it lives in topbar */
+.sidebar-footer .sf-user-block,
+.sidebar-footer #sf-company,
+.sidebar-footer #sf-email,
+.sidebar-footer #sf-role,
+.sidebar-footer .sf-divider {
+  display: none !important;
+}
+
+/* Keep only Sign out in sidebar footer (or move that to topbar dropdown too) */
+.sidebar-footer {
+  padding: 10px !important;
+}
+
+/* Dropdown for topbar user (shown when clicked) */
+.topbar-user-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 200px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 6px;
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  display: none;
+}
+
+.topbar-user-menu.open {
+  display: block;
+}
+
+.topbar-user-menu .menu-item {
+  display: block;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-family: 'Inter', sans-serif;
+}
+
+.topbar-user-menu .menu-item:hover {
+  background: var(--card-2);
+}
+
+.topbar-user-menu .menu-item.danger {
+  color: var(--red);
+}
+
+.topbar-user-menu .menu-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.topbar-user-menu .menu-header {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.topbar-user-menu .menu-header .h-company {
+  font-size: 11px;
+  color: var(--cta);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.topbar-user-menu .menu-header .h-email {
+  font-size: 12px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.topbar-user-menu .menu-header .h-role {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+/* Position context for the topbar so dropdown positions correctly */
+
+
+.topbar .tb-right {
+  position: relative;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   V13.3 — Final minor fixes
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Task 1: Hide all sidebar user/company info (now in topbar) */
+.sidebar-footer #sidebar-company-name,
+.sidebar-footer #sidebar-user-info,
+.sidebar-footer .sf-text {
+  display: none !important;
+}
+
+/* Hide the divider line and Sign out from sidebar (topbar menu has it) */
+.sidebar-footer > div {
+  display: none !important;
+}
+
+.sidebar-footer {
+  display: none !important;
+}
+
+/* Task 2: Topbar fixed (override any earlier rules) */
+
+
+/* If your layout uses a different container, force topbar position */
+.main .topbar,
+#main-app 
+
+/* Task 3: Monthly Interest card (highlighted gold KPI) — dark text */
+.metric-card.hi,
+.metric-card.hi *,
+.metric-card.hi label,
+.metric-card.hi .kpi-label,
+.metric-card.hi .value,
+.metric-card.hi .num,
+.metric-card.hi span,
+.metric-card.hi div {
+  color: #1A1F2E !important;
+}
+
+.metric-card.hi label,
+.metric-card.hi .kpi-label {
+  color: rgba(26, 31, 46, 0.7) !important;
+}
+
+/* Task 4: Menu pane color — dark mode #242A39, light mode light gray */
+.sidebar {
+  background: #242A39 !important;
+}
+
+[data-theme="light"] .sidebar {
+  background: #F1F3F7 !important;
+  border-right: 1px solid #E5E8EE !important;
+}
+
+[data-theme="light"] .sidebar .logo {
+  color: var(--text) !important;
+}
+
+[data-theme="light"] .nav-item {
+  color: #5C6577 !important;
+}
+
+[data-theme="light"] .nav-item:hover {
+  background: #FFFFFF !important;
+  color: var(--text) !important;
+}
+
+[data-theme="light"] .nav-item.active {
+  background: #FFFFFF !important;
+  color: var(--text) !important;
+}
+
+[data-theme="light"] .nav-icon {
+  color: #5C6577 !important;
+}
+
+[data-theme="light"] .nav-section {
+  color: #8B95A7 !important;
+}
+
+[data-theme="light"] .nav-item.active .nav-icon {
+  color: var(--cta) !important;
+}
+
+/* Task 5: Pie chart card must NEVER overflow regardless of viewport */
+.card,
+.form-card {
+  overflow: hidden !important;
+  min-width: 0 !important;
+}
+
+/* Force any canvas inside a card to stay inside */
+.card canvas,
+.form-card canvas {
+  max-width: 100% !important;
+  max-height: 240px !important;
+  height: auto !important;
+  width: auto !important;
+  display: block;
+}
+
+/* Specific fix for the loan status doughnut card */
+.card[data-chart="status"],
+#loan-status-card,
+.loan-status-card,
+.card:has(> canvas) {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden !important;
+}
+
+.card[data-chart="status"] canvas,
+#loan-status-card canvas,
+.loan-status-card canvas {
+  max-height: 180px !important;
+  max-width: 180px !important;
+  margin: 12px auto 0 !important;
+  flex-shrink: 0;
+}
+
+/* Generic chart-container wrapper if used */
+.chart-container {
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.chart-container canvas {
+  max-width: 100% !important;
+}
+
+
+/* ─── Chart card specific (used in dashboard for broker + status charts) ── */
+.chart-card {
+  overflow: hidden !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.chart-card > div[style*="position:relative"] {
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.chart-card canvas {
+  max-width: 100% !important;
+  max-height: 160px !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
+
+/* Grid container for chart cards — make sure cards shrink properly */
+.chart-cards-row,
+.charts-row,
+.dashboard-charts {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* If chart cards are in a flex parent, ensure they shrink */
+.chart-card,
+.metric-card {
+  flex-shrink: 1 !important;
+  flex-basis: 0 !important;
+  min-width: 0 !important;
+}
+
+
+/* ─── Chart grid responsive override (broker + loan status) ──────────── */
+.chart-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+/* On smaller screens, force single column */
+@media (max-width: 720px) {
+  .chart-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   V13.5 — Topbar adapts to sidebar collapsed state
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Topbar is INSIDE .main, so we position it relative to .main */
+/* Use position: sticky on the main's scroll - but since body scrolls, use fixed
+   and let JS sync the left offset */
+
+.topbar {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  z-index: 100 !important;
+  background: var(--bg) !important;
+  border-bottom: 1px solid var(--border) !important;
+  /* left set by JS dynamically to match sidebar state */
+  transition: left .25s ease;
+}
+
+/* Default desktop with sidebar expanded */
+body:not(.is-mobile) .topbar {
+  left: 220px;
+}
+
+/* Sidebar collapsed */
+body.sidebar-collapsed:not(.is-mobile) .topbar {
+  left: 52px;
+}
+
+/* Mobile — sidebar floats over, topbar is full width */
+@media (max-width: 768px) {
+  .topbar {
+    left: 0 !important;
+  }
+}
+
+body.is-mobile .topbar {
+  left: 0 !important;
+}
+
+
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   V13.6 — Mobile topbar overlap fix
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Reserve space for the fixed topbar — applied at the .main level */
+.main {
+  padding-top: 56px !important;
+}
+
+/* Compact topbar on mobile (single row, smaller padding) */
+@media (max-width: 768px) {
+  .topbar {
+    padding: 10px 14px !important;
+    flex-wrap: nowrap !important;
+    gap: 8px;
+  }
+
+  /* Hide secondary topbar elements on narrow screens to keep one row */
+  .topbar-status,
+  .topbar #refresh-btn {
+    display: none !important;
+  }
+
+  /* Smaller "+ New" button on mobile */
+  .topbar .btn-primary {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+  }
+
+  /* Smaller user avatar/info on mobile */
+  .topbar-user {
+    padding-left: 8px;
+    margin-left: 4px;
+  }
+
+  .topbar-user .tb-info {
+    display: none; /* Hide name/role text on mobile, keep avatar only */
+  }
+
+  /* Make sure main content reserves space for topbar */
+  .main {
+    padding-top: 52px !important;
+  }
+}
+
+/* On very narrow screens, hide page title to give room for buttons */
+@media (max-width: 480px) {
+  #page-title {
+    display: none;
+  }
+
+  .topbar {
+    padding: 8px 10px !important;
+  }
+}
+
+
+
+
+
+/* ─── V13.7 (CORRECTED): Z-index hierarchy + sidebar logo position ───── */
+
+/* Logo + sidebar header stays at top — DO NOT add padding to sidebar */
+/* The topbar sits beside the sidebar, not over it, on desktop */
+
+/* Z-index hierarchy:
+   - sidebar-overlay: 99 (behind sidebar on mobile)
+   - sidebar:         100 (above overlay on mobile)
+   - topbar:          101 (always on top, but only spans area RIGHT of sidebar)
+*/
+.sidebar-overlay {
+  z-index: 99 !important;
+}
+
+.sidebar {
+  z-index: 100 !important;
+  /* No padding-top — logo stays at top */
+}
+
+.topbar {
+  z-index: 101 !important;
+}
+
+/* On desktop the topbar is positioned with left: 220px so it doesn't overlap sidebar
+   The sidebar logo is fully visible because topbar starts AFTER the sidebar */
+
+/* MOBILE specific */
+@media (max-width: 768px) {
+  /* Sidebar slides in from the left when mob-open */
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: var(--sidebar-w) !important;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  .sidebar.mob-open {
+    transform: translateX(0) !important;
+    z-index: 100 !important;
+  }
+
+  /* Overlay: behind sidebar but above page content */
+  .sidebar-overlay {
+    z-index: 99 !important;
+  }
+
+  /* Topbar stays full width on mobile */
+  .topbar {
+    left: 0 !important;
+    z-index: 101 !important;
+  }
+
+  /* When mobile menu is open, topbar should not be above the sidebar */
+  body.mob-menu-open .topbar {
+    z-index: 98 !important;
+  }
+}
+
+
+/* ─── V13.8: Collapsed sidebar — wider, centered icons, rounded square active ─ */
+
+/* Widen collapsed sidebar from 52px to 64px for better icon visibility */
+.sidebar.collapsed {
+  width: 64px !important;
+}
+
+/* When sidebar is collapsed, push main content accordingly */
+body.sidebar-collapsed:not(.is-mobile) .main {
+  margin-left: 64px !important;
+}
+
+body.sidebar-collapsed:not(.is-mobile) .topbar {
+  left: 64px !important;
+}
+
+/* Center icons in collapsed mode */
+.sidebar.collapsed .nav-item {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 4px 8px !important;
+  padding: 10px 0 !important;
+  position: relative;
+  width: 48px !important;
+  box-sizing: border-box;
+  border-radius: 10px !important;
+}
+
+.sidebar.collapsed .nav-icon {
+  width: auto !important;
+  margin: 0 !important;
+  font-size: 16px !important;
+}
+
+/* Hide text labels when collapsed */
+.sidebar.collapsed .nav-item span:not(.nav-icon),
+.sidebar.collapsed .nav-item > *:not(.nav-icon):not(svg):not(i),
+.sidebar.collapsed .nav-section {
+  display: none !important;
+}
+
+/* Active item in collapsed mode — rounded square with theme */
+.sidebar.collapsed .nav-item.active {
+  background: var(--card-2) !important;
+  border-radius: 10px !important;
+}
+
+/* Remove the gold left-border accent in collapsed mode (looks weird with centered icons) */
+.sidebar.collapsed .nav-item.active::before {
+  display: none !important;
+}
+
+/* Center the logo and remove text in collapsed mode */
+.sidebar.collapsed .logo {
+  text-align: center !important;
+  font-size: 14px !important;
+  padding: 0 !important;
+}
+
+/* Hide the subtitle text under logo when collapsed */
+.sidebar.collapsed .logo-subtitle,
+.sidebar.collapsed .sb-header > div:not(:first-child),
+.sidebar.collapsed [class*="subtitle"] {
+  display: none !important;
+}
+
+/* Hide section labels (OVERVIEW, TOOLS, etc) when collapsed */
+.sidebar.collapsed .nav-section {
+  visibility: hidden;
+  height: 0;
+  padding: 0;
+  margin: 0;
+}
+
+
+/* ─── V13.9: Allow date pickers + dropdowns to escape card overflow ────── */
+
+/* Restore visibility for forms that need dropdowns/calendars to overflow */
+.form-card,
+.form-card .fgroup,
+.fg2,
+.fgroup,
+.detail-grid,
+.detail-field {
+  overflow: visible !important;
+}
+
+/* Make sure the .card containing a form (Add Loan / Edit Loan) doesn't clip */
+.page#page-add .card,
+.page#page-loan-detail .card,
+.page[id^="page-add"] .card,
+.page[id^="page-loan"] .card,
+.page[id^="page-customer"] .card,
+.page[id^="page-broker"] .card,
+.page#page-add-customer .card,
+.page#page-add-broker .card,
+.page#page-payment-detail .card {
+  overflow: visible !important;
+}
+
+/* Calendar/datepicker popups need high z-index too */
+.flatpickr-calendar,
+.calendar-popup,
+[class*="datepicker"],
+[id*="datepicker"] {
+  z-index: 1000 !important;
+}
+
+/* The custom month-year picker (calendar overlay) */
+[id^="month-picker"],
+[class*="month-picker"] {
+  z-index: 1000 !important;
+  position: absolute !important;
+}
+
+/* But KEEP overflow:hidden on chart cards specifically (don't break pie chart fix) */
+.chart-card,
+.chart-card > div[style*="position:relative"] {
+  overflow: hidden !important;
+}
